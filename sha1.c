@@ -163,9 +163,8 @@ void SHA1_Final(SHA1_CTX *ctx, unsigned char *message_digest) {
 
 void SHA1_Update(SHA1_CTX *ctx, const void *data, size_t len) {
   size_t write_len =
-      ((ctx->active_len + len) > BLOCK_BYTES) ? BLOCK_BYTES : len;
+      ((ctx->active_len + len) > BLOCK_BYTES) ? (BLOCK_BYTES-ctx->active_len) : len;
 
-  write_len -= ctx->active_len;
   memcpy(ctx->block + ctx->active_len, data, write_len);
   ctx->len += write_len;
   ctx->active_len += write_len;
