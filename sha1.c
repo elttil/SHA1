@@ -62,12 +62,11 @@ void pad_sha1_message(uint8_t *M, size_t l, size_t active_l, uint8_t *block) {
 
   // Then append the 64-bit block that is equal to the number 'l' expressed
   // using a binary representatio
-  uint64_t *final_64bit_block;
-  final_64bit_block =
-      (uint64_t *)(block + active_l / 8 + k / 8 + 1 + sizeof(uint32_t));
+  uint32_t *final_32bit_block;
+  final_32bit_block = (uint32_t *)(block + active_l / 8 + k / 8 + 1);
 
-  *(final_64bit_block - sizeof(uint32_t)) = reverse_32(l >> 32);
-  *(final_64bit_block) = reverse_32(l & 0xFFFFFFFF);
+  *(final_32bit_block) = reverse_32(l >> 32);
+  *(final_32bit_block + 1) = reverse_32(l & 0xFFFFFFFF);
 }
 
 uint32_t sha1_f(uint8_t t, uint32_t x, uint32_t y, uint32_t z) {
@@ -162,8 +161,9 @@ void SHA1_Final(SHA1_CTX *ctx, unsigned char *message_digest) {
 }
 
 void SHA1_Update(SHA1_CTX *ctx, const void *data, size_t len) {
-  size_t write_len =
-      ((ctx->active_len + len) > BLOCK_BYTES) ? (BLOCK_BYTES-ctx->active_len) : len;
+  size_t write_len = ((ctx->active_len + len) > BLOCK_BYTES)
+                         ? (BLOCK_BYTES - ctx->active_len)
+                         : len;
 
   memcpy(ctx->block + ctx->active_len, data, write_len);
   ctx->len += write_len;
