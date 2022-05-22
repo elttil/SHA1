@@ -157,6 +157,9 @@ void SHA1_Final(SHA1_CTX *ctx, unsigned char *message_digest) {
     add_block(ctx, block + BLOCK_BYTES);
 
   for (size_t i = 0; i < 5; i++)
+    ctx->h[i] = reverse_32(ctx->h[i]);
+
+  for (size_t i = 0; i < 5; i++)
     memcpy(message_digest + sizeof(uint32_t) * i, &ctx->h[i], sizeof(uint32_t));
 }
 
@@ -177,7 +180,7 @@ void SHA1_Update(SHA1_CTX *ctx, const void *data, size_t len) {
 
   if (len > write_len) {
     len -= write_len;
-    data += write_len;
-    return SHA1_Update(ctx, data, len);
+    data = (const void*)((uint64_t)data + write_len);
+    SHA1_Update(ctx, data, len);
   }
 }
