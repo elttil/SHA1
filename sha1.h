@@ -9,6 +9,7 @@
 #include <stdint.h>
 
 #define BLOCK_BYTES (64) /* 512/8 */
+#define SHA1_LEN (20)
 
 typedef struct SHA1_CTX {
   uint32_t h[5];
