@@ -14,11 +14,11 @@
 typedef struct SHA1_CTX {
   uint32_t h[5];
   uint8_t block[BLOCK_BYTES];
-  size_t active_len;
-  size_t len;
+  uint64_t active_len;
+  uint64_t len;
 } SHA1_CTX;
 
 void SHA1_Init(SHA1_CTX *ctx);
-void SHA1_Update(SHA1_CTX *ctx, const void *data, size_t len);
+void SHA1_Update(SHA1_CTX *ctx, const void *data, uint64_t len);
 void SHA1_Final(SHA1_CTX *ctx, unsigned char *message_digest);
 #endif

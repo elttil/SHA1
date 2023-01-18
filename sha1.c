@@ -15,6 +15,11 @@
 #define SHA1_CONSTANT_H3 0x10325476
 #define SHA1_CONSTANT_H4 0xc3d2e1f0
 
+#define SHA1_CONSTANT_K1 0x5a827999
+#define SHA1_CONSTANT_K2 0x6ed9eba1
+#define SHA1_CONSTANT_K3 0x8f1bbcdc
+#define SHA1_CONSTANT_K4 0xca62c1d6
+
 void SHA1_Init(SHA1_CTX *ctx) {
   // 6.1.1 SHA-1 Preprocessing
 
@@ -35,7 +40,7 @@ uint32_t reverse_32(uint32_t _value) {
           ((_value & 0x00FF0000) >> 8) | ((_value & 0xFF000000) >> 24));
 }
 
-void pad_sha1_message(uint8_t *M, size_t l, size_t active_l, uint8_t *block) {
+void pad_sha1_message(uint8_t *M, uint64_t l, uint64_t active_l, uint8_t *block) {
   // FIXME: Use a secure function. Not memset
   memset(block, 0, 1024 / 8);
   memcpy(block, M, active_l / 8);
@@ -87,13 +92,13 @@ uint32_t sha1_f(uint8_t t, uint32_t x, uint32_t y, uint32_t z) {
 
 uint32_t sha1_get_k(uint8_t t) {
   if (t <= 19)
-    return 0x5a827999;
+    return SHA1_CONSTANT_K1;
   if (t <= 39)
-    return 0x6ed9eba1;
+    return SHA1_CONSTANT_K2;
   if (t <= 59)
-    return 0x8f1bbcdc;
+    return SHA1_CONSTANT_K3;
   if (t <= 79)
-    return 0xca62c1d6;
+    return SHA1_CONSTANT_K4;
   assert(0);
 }
 
@@ -163,7 +168,7 @@ void SHA1_Final(SHA1_CTX *ctx, unsigned char *message_digest) {
     memcpy(message_digest + sizeof(uint32_t) * i, &ctx->h[i], sizeof(uint32_t));
 }
 
-void SHA1_Update(SHA1_CTX *ctx, const void *data, size_t len) {
+void SHA1_Update(SHA1_CTX *ctx, const void *data, uint64_t len) {
   size_t write_len = ((ctx->active_len + len) > BLOCK_BYTES)
                          ? (BLOCK_BYTES - ctx->active_len)
                          : len;
@@ -180,7 +185,7 @@ void SHA1_Update(SHA1_CTX *ctx, const void *data, size_t len) {
 
   if (len > write_len) {
     len -= write_len;
-    data = (const void*)((uint64_t)data + write_len);
+    data = (const void*)((uintptr_t)data + write_len);
     SHA1_Update(ctx, data, len);
   }
 }
