@@ -1,6 +1,6 @@
 # SHA1 Implementation
 
-A implementation of SHA1 written in C licensed under BSD-2-Clause.
+A implementation of SHA1 written in C.
 
 # Functions
 ```C
