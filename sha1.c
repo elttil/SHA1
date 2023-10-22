@@ -4,7 +4,6 @@
 // SPDX-License-Identifier: 0BSD
 //
 #include "sha1.h"
-#include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
@@ -40,8 +39,8 @@ uint32_t reverse_32(uint32_t _value) {
           ((_value & 0x00FF0000) >> 8) | ((_value & 0xFF000000) >> 24));
 }
 
-void pad_sha1_message(uint8_t *M, uint64_t l, uint64_t active_l, uint8_t *block) {
-  // FIXME: Use a secure function. Not memset
+void pad_sha1_message(uint8_t *M, uint64_t l, uint64_t active_l,
+                      uint8_t *block) {
   memset(block, 0, 1024 / 8);
   memcpy(block, M, active_l / 8);
 
@@ -87,7 +86,7 @@ uint32_t sha1_f(uint8_t t, uint32_t x, uint32_t y, uint32_t z) {
     // Maj(x,y,z)
     return (x & y) ^ (x & z) ^ (y & z);
   }
-  assert(0);
+  return 0;
 }
 
 uint32_t sha1_get_k(uint8_t t) {
@@ -99,7 +98,7 @@ uint32_t sha1_get_k(uint8_t t) {
     return SHA1_CONSTANT_K3;
   if (t <= 79)
     return SHA1_CONSTANT_K4;
-  assert(0);
+  return 0;
 }
 
 uint32_t ROTL(uint32_t value, uint8_t shift) {
