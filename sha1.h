@@ -21,4 +21,6 @@ typedef struct SHA1_CTX {
 void SHA1_Init(SHA1_CTX *ctx);
 void SHA1_Update(SHA1_CTX *ctx, const void *data, uint64_t len);
 void SHA1_Final(SHA1_CTX *ctx, unsigned char *message_digest);
+void SHA1_HMAC(unsigned char *message, uint64_t message_len, unsigned char *key,
+               uint64_t key_len, uint8_t output[SHA1_LEN]);
 #endif
