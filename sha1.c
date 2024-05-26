@@ -168,24 +168,23 @@ void SHA1_Final(SHA1_CTX *ctx, unsigned char *message_digest) {
 }
 
 void SHA1_Update(SHA1_CTX *ctx, const void *data, uint64_t len) {
-  size_t write_len = ((ctx->active_len + len) > BLOCK_BYTES)
-                         ? (BLOCK_BYTES - ctx->active_len)
-                         : len;
+  for (; len > 0;) {
+    size_t write_len = ((ctx->active_len + len) > BLOCK_BYTES)
+                           ? (BLOCK_BYTES - ctx->active_len)
+                           : len;
 
-  memcpy(ctx->block + ctx->active_len, data, write_len);
-  ctx->len += write_len;
-  ctx->active_len += write_len;
-  if (BLOCK_BYTES != ctx->active_len)
-    return;
+    memcpy(ctx->block + ctx->active_len, data, write_len);
+    ctx->len += write_len;
+    ctx->active_len += write_len;
+    if (BLOCK_BYTES != ctx->active_len)
+      return;
 
-  add_block(ctx, ctx->block);
-  memset(ctx->block, 0, BLOCK_BYTES);
-  ctx->active_len = 0;
+    add_block(ctx, ctx->block);
+    memset(ctx->block, 0, BLOCK_BYTES);
+    ctx->active_len = 0;
 
-  if (len > write_len) {
     len -= write_len;
     data = (const void *)((uintptr_t)data + write_len);
-    SHA1_Update(ctx, data, len);
   }
 }
 
