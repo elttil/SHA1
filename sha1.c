@@ -167,6 +167,14 @@ void SHA1_Final(SHA1_CTX *ctx, unsigned char *message_digest) {
     memcpy(message_digest + sizeof(uint32_t) * i, &ctx->h[i], sizeof(uint32_t));
 }
 
+void SHA1_OneShot(const void *data, uint64_t len,
+                  unsigned char *message_digest) {
+  SHA1_CTX ctx;
+  SHA1_Init(&ctx);
+  SHA1_Update(&ctx, data, len);
+  SHA1_Final(&ctx, message_digest);
+}
+
 void SHA1_Update(SHA1_CTX *ctx, const void *data, uint64_t len) {
   for (; len > 0;) {
     size_t write_len = ((ctx->active_len + len) > BLOCK_BYTES)
@@ -209,10 +217,7 @@ void SHA1_HMAC(unsigned char *message, uint64_t message_len, unsigned char *key,
   // appended with 44 zero bytes 0x00)
   unsigned char hashed_key[SHA1_LEN];
   if (key_len > BLOCK_SIZE) {
-    SHA1_CTX ctx;
-    SHA1_Init(&ctx);
-    SHA1_Update(&ctx, key, key_len);
-    SHA1_Final(&ctx, hashed_key);
+    SHA1_OneShot(key, key_len, hashed_key);
     key = hashed_key;
     key_len = SHA1_LEN;
   }
