@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2022 by Anton Kling <anton@kling.gg>
+// Copyright (C) 2022-2025 by Anton Kling <anton@kling.gg>
 //
 // SPDX-License-Identifier: 0BSD
 //
@@ -34,12 +34,12 @@ void SHA1_Init(SHA1_CTX *ctx) {
   memset(ctx->block, 0, BLOCK_BYTES);
 }
 
-uint32_t reverse_32(uint32_t _value) {
+static uint32_t reverse_32(uint32_t _value) {
   return (((_value & 0x000000FF) << 24) | ((_value & 0x0000FF00) << 8) |
           ((_value & 0x00FF0000) >> 8) | ((_value & 0xFF000000) >> 24));
 }
 
-void pad_sha1_message(uint8_t *M, uint64_t l, uint64_t active_l,
+static void pad_sha1_message(uint8_t *M, uint64_t l, uint64_t active_l,
                       uint8_t *block) {
   memset(block, 0, 1024 / 8);
   memcpy(block, M, active_l / 8);
@@ -73,7 +73,7 @@ void pad_sha1_message(uint8_t *M, uint64_t l, uint64_t active_l,
   *(final_32bit_block + 1) = reverse_32(l & 0xFFFFFFFF);
 }
 
-uint32_t sha1_f(uint8_t t, uint32_t x, uint32_t y, uint32_t z) {
+static uint32_t sha1_f(uint8_t t, uint32_t x, uint32_t y, uint32_t z) {
   if (t <= 19) {
     // Ch(x,y,z)
     return (x & y) ^ ((~x) & z);
@@ -89,7 +89,7 @@ uint32_t sha1_f(uint8_t t, uint32_t x, uint32_t y, uint32_t z) {
   return 0;
 }
 
-uint32_t sha1_get_k(uint8_t t) {
+static uint32_t sha1_get_k(uint8_t t) {
   if (t <= 19)
     return SHA1_CONSTANT_K1;
   if (t <= 39)
@@ -101,13 +101,13 @@ uint32_t sha1_get_k(uint8_t t) {
   return 0;
 }
 
-uint32_t ROTL(uint32_t value, uint8_t shift) {
+static uint32_t ROTL(uint32_t value, uint8_t shift) {
   uint32_t rotated = value << shift;
   uint32_t did_overflow = value >> (32 - shift);
   return (rotated | did_overflow);
 }
 
-void add_block(SHA1_CTX *ctx, uint8_t *_block) {
+static void add_block(SHA1_CTX *ctx, uint8_t *_block) {
   uint32_t *block = (uint32_t *)_block;
   for (size_t i = 0; i < 16; i++)
     block[i] = reverse_32(block[i]);
